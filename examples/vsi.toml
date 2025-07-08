@@ -67,11 +67,18 @@ apply_viscosity = false
 # - `ddsv`: Dilatation-dependent shear viscosity
 # - `moin_ddsv`: Moin et al + Dilatation-dependent shear viscosity
 # - `vreman_ddsv`: Vreman + Dilatation-dependent shear viscosity
-viscosity_type = "moin"
+viscosity_type = "moin_les"
 c_ddsv = 1.0
 
 # Boolean for naming files using the step number rather than the time:
 name_using_step = true
+
+# This flag is for a non-reflective BC.
+balanced = true
+
+apply_fargo_trick = true
+# This is needed only if the above is true:
+apply_fargo_correction = true
 
 # Boundary condition types
 # Options:
@@ -92,12 +99,6 @@ rmax = "zero_normal_momentum"
 zmin = "zero_normal_momentum"
 zmax = "zero_normal_momentum"
 
-# This flag is for a non-reflective BC.
-balanced = true
-
-apply_fargo_trick = true
-# This is needed only if the above is true:
-apply_fargo_correction = true
 
 [vertical_shear_instability.sponge]
 apply_sponge = true
