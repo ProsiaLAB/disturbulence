@@ -1,0 +1,26 @@
+[euler_1d_test_z]
+# Problem type
+# Options:
+# - `acoustic_pulse`
+# - `shock_tube`
+problem_type = "acoustic_pulse"
+
+nz = 512
+
+# Number of output steps
+n_output_steps = 4
+
+# Time between output steps
+dt_output = 0.15
+
+cfl = 1.0
+
+# These two parameters apply for the acoustic pulse test case only:
+isothermal = false
+periodic_z = true
+
+# These parameters are for the shock tube test case only:
+apply_pade_filter = true
+eps_filter = 0.05
+apply_artificial_pressure = true
+c_ap = 2.0

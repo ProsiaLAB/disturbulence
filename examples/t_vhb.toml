@@ -1,0 +1,21 @@
+[vertical_hydrostatic_balance]
+nz = 256
+cfl = 1.0
+nsteps = 1000
+profiles_interval = 100
+apply_pade_filter = false
+eps_or_tau = "eps"
+eps_filter = 0.01
+tau_filter = 0.25
+
+# Parameters of superimposed acoustic pulse
+eps = 0.01
+sigma = 0.20
+z0 = 0.0
+
+# This sets the min and max of the domain in terms of the scale height
+zmax_over_H = 3.0
+
+apply_artificial_pressure = false
+c_ap = 1.0
+isothermal = false

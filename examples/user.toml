@@ -1,0 +1,6 @@
+[user_application]
+restart = false
+nr = 1
+nz = 1
+nphi = 1
+nsteps = 1

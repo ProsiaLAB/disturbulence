@@ -1,0 +1,17 @@
+[single_vortex_fargo_test]
+restart = false
+nr = 1024
+nphi = 1024
+# nr = 100
+# nphi = 10
+cfl = 1.0
+# nsteps = 1000
+nsteps = 2000
+tecplot_interval = 100
+tau_filter = 0.05
+apply_fargo_trick = false
+integer_shifts = false
+apply_fargo_correction = false
+use_supplied_dt = false
+dt = 0.00034
+isothermal = true
