@@ -1,0 +1,49 @@
+[taylor_couette_flow]
+# TCF modes
+# Options:
+# - `marcus`: Marcus axisymmetric Taylor-Couette
+# - `dong`: Dong (2007), L_z/d = 2*pi
+# - `axial`: Axial motion of the cylinders.
+# - `meyer`: Meyer-Spasche and Keller
+# - `moser`: Moser
+# - `dong_counter_rotating`: Dong (2008) counter-rotating, Lz/d = 2*pi, eta = 0.5
+# - `laminar_moser`: Laminar with the same sub-types as Moser.
+mode = "dong_counter_rotating"
+
+# Sub-modes (for `moser` and `laminar_moser` modes)
+# Options:
+# - `meyer`: Meyer
+# - `ds_narrow`: Donnelly & Simon narrow gap (moser_DS_narrow)
+# - `ds_wide`: Donnelly & Simon wide   gap (moser_DS_wide  )
+sub_mode = "ds_wide"
+
+# Reynolds number for Dong's (2007) or (2008) set-up (mode = 2 or 7):
+re_dong = 500.0
+
+restart = true
+
+# File version
+# Options:
+# - `old`: Old style restart file with basic state
+# - `new`: New style restart file without basic state
+file_version = "new"
+
+perturb = false
+
+nr = 32
+nz = 32
+nphi = 1
+
+cfl = 1.5
+nsteps = 30000
+
+# Also interval for Reynolds averages:
+tecplot_interval = 30000
+profiles_interval = 10
+save_interval = 10000
+history_interval = 50
+
+apply_pade_filter = true
+eps_or_tau = "eps"
+eps_filter = 0.02
+tau_filter = 0.0

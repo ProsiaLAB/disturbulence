@@ -1,0 +1,18 @@
+[vortex_pair]
+restart = false
+nr = 512
+nphi = 512
+cfl = 1.5
+nsteps = 100000
+hit_target = true
+t_target = 4.0
+tecplot_interval = 200
+tau_filter = 0.01
+apply_fargo_trick = false
+integer_shifts = false
+apply_fargo_correction = false
+use_supplied_dt = false
+dt = 4.9063e-5
+isothermal = true
+apply_artificial_pressure = false
+c_ap = 1.0

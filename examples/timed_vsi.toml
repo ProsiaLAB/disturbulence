@@ -1,0 +1,130 @@
+[timed_vsi_output]
+n_output_steps = 4
+dt_output = 0.25
+
+# plot_many_horizontal_planes = true
+# time_interval_for_many_horizontal_plots = 0.5
+restart = true
+
+# File version
+# Options:
+# - `old`: Old style restart file with basic state
+# - `new`: New style restart file without basic state
+file_version = "new"
+
+perturb = false
+isothermal = true
+nr = 512
+nz = 512
+nphi = 1024
+phi_max_over_pi = 2.0
+
+cfl = 1.5
+dt_min = 1.0e-8
+nsteps = 30000
+use_supplied_dt = true
+dt_supplied = 2.77e-4
+
+tecplot_interval = 500
+
+output_profiles = false
+profiles_interval = 20000000
+
+# Output Reynolds phi averages from which Favre phi-time averaged means and stresses
+# can be computed by passing the cmd line argument `--phi-reynolds-averages`.
+output_phi_reynolds_averages = false
+time_interval_for_phi_reynolds_averages = 0.5
+
+fluctuation_kinetic_energy_interval = 200
+
+# Interval for intermediate writing of a file called "save_xxxx" or "mpi_save_xxxx", 
+# with the same format as a restart file.
+save_interval = 2000
+wavy_perturbation = true
+zmax_over_H0 = 3.5
+
+use_rsize_for_domain = true
+# If the above is true, this will determine the domain size:
+rsize_over_H0 = 7.0
+rmin_over_H0 = 6.5
+# Otherwise this will determine the domain size:
+n_waves_in_r = 10
+
+use_manger_p = false
+
+apply_newtonian_cooling = false
+tau_cooling_over_t_kepler_at_mid_radius = 0.0
+
+apply_pade_filter = true
+eps_or_tau = "eps"
+eps_filter = 0.125
+tau_filter = 0.05
+filtering_interval = 2
+
+apply_artificial_pressure = true
+c_ap = 1.3
+
+apply_viscosity = false
+
+# Viscosity
+# Options:
+# - `laminar` | `molecular` : Laminar or molecular viscosity
+# - `moin_les`: Moin et al LES model (non-dynamic)
+# - `vreman`: Vreman LES model + compressibility additions
+# - `ddsv`: Dilatation-dependent shear viscosity
+# - `moin_ddsv`: Moin et al + Dilatation-dependent shear viscosity
+# - `vreman_ddsv`: Vreman + Dilatation-dependent shear viscosity
+viscosity_type = "moin_les"
+c_ddsv = 1.0
+
+# Boolean for naming files using the step number rather than the time:
+name_using_step = true
+
+# This flag is for a non-reflective BC.
+balanced = true
+
+apply_fargo_trick = false
+# This is needed only if the above is true:
+apply_fargo_correction = true
+
+# Boundary condition types
+# Options:
+# - `null` 
+# - `non_reflective`
+# - `zero_normal_momentum`
+# - `cassen_moosman`
+# - `zero_normal_momentum_if_subsonic`
+# - `outflow`
+# - `periodic`
+# - `viscous_wall`
+# - `zero_shear_stress`
+# - `z_dirichlet`
+# - `hold_basic_state`
+[timed_vsi_output.bc]
+rmin = "zero_normal_momentum"
+rmax = "zero_normal_momentum"
+zmin = "zero_normal_momentum"
+zmax = "zero_normal_momentum"
+
+
+[timed_vsi_output.sponge]
+apply_sponge = true
+# Sponge type
+# Options:
+# - `bsd_nul`: Sponge when basic-state density is < rho1. rho2 marks the end of the
+#              transition region where the sponge ends.
+# - `drw_nul`: sponge when the distance from the nearest radial boundary < d1.  d2 marks
+#              the end of the transition region.
+# - `daw_nul`: sponge when the distance from any boundary is < d1
+# - `bsd_drm`: This combined bsd and distance from the rmin boundary.
+# - `drw_bsd`: Combines the "distance to the nearest radial boundary" and
+#               "basic state density criteria"
+sponge_type = "daw_nul"
+rho1 = 0.008
+rho2 = 0.01
+# d1 = 0.25
+# d2 = 0.50
+d1 = 0.4
+d2 = 0.5
+n_decay_steps = 20
+tau_decay = 0.0

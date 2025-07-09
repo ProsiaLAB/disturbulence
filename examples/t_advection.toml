@@ -1,0 +1,18 @@
+[advection_test]
+restart = false
+
+# File version
+# Options:
+# - `old`: Old style restart file with basic state
+# - `new`: New style restart file without basic state
+file_version = "new"
+
+nr = 8
+nz = 8
+nphi = 8
+
+t_max_over_pi = 6.0
+cfl = 1.0
+
+apply_pade_filter = true
+eps_filter = 0.005
