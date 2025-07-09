@@ -1,2 +1,11 @@
+pub mod advection;
 pub mod config;
+pub mod euler;
+pub mod hsbr;
 pub mod modes;
+pub mod svf;
+pub mod tcf;
+pub mod user;
+pub mod vhb;
+pub mod vp;
+pub mod vsi;
