@@ -1,15 +1,14 @@
-use std::marker::PhantomData;
-
 use serde::Deserialize;
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Default)]
 #[serde(rename_all = "snake_case")]
-enum RunType {
+pub enum RunType {
     UserApplication,
     Euler1DTestZ,
     VerticalHydrostaticBalance,
     SolidBodyRotation,
     SingleVortexFargoTest,
+    #[default]
     VerticalShearInstability,
     VortexPair,
     TaylorCouetteFlow,
@@ -18,7 +17,9 @@ enum RunType {
 }
 
 #[derive(Debug, Deserialize, Default)]
-pub struct UserConfig {
+pub struct Config {
+    #[serde(default)]
+    pub run_type: RunType,
     #[serde(default)]
     pub restart: bool,
     #[serde(default)]
@@ -29,14 +30,8 @@ pub struct UserConfig {
     pub nphi: usize,
     #[serde(default)]
     pub nsteps: usize,
-}
-
-#[derive(Debug, Deserialize, Default)]
-pub struct Euler1DConfig {
     #[serde(default)]
     pub problem_type: ProblemType,
-    #[serde(default)]
-    pub nz: usize,
     #[serde(default)]
     pub n_output_steps: usize,
     #[serde(default)]
@@ -55,24 +50,10 @@ pub struct Euler1DConfig {
     pub apply_artificial_pressure: bool,
     #[serde(default)]
     pub c_ap: f64,
-}
-
-#[derive(Debug, Deserialize, Default)]
-pub struct VHBConfig {
-    #[serde(default)]
-    pub nz: usize,
-    #[serde(default)]
-    pub cfl: f64,
-    #[serde(default)]
-    pub nsteps: usize,
     #[serde(default)]
     pub profiles_interval: usize,
     #[serde(default)]
-    pub apply_pade_filter: bool,
-    #[serde(default)]
     pub eps_or_tau: EpsOrTau,
-    #[serde(default)]
-    pub eps_filter: f64,
     #[serde(default)]
     pub tau_filter: f64,
     #[serde(default)]
@@ -84,35 +65,7 @@ pub struct VHBConfig {
     #[serde(default)]
     pub zmax_over_h: f64,
     #[serde(default)]
-    pub apply_artificial_pressure: bool,
-    #[serde(default)]
-    pub c_ap: f64,
-    #[serde(default)]
-    pub isothermal: bool,
-}
-
-#[derive(Debug, Deserialize, Default)]
-pub struct HSBRConfig {
-    #[serde(skip)]
-    _marker: PhantomData<()>,
-}
-
-#[derive(Debug, Deserialize, Default)]
-pub struct SVFConfig {
-    #[serde(default)]
-    pub restart: bool,
-    #[serde(default)]
-    pub nr: usize,
-    #[serde(default)]
-    pub nphi: usize,
-    #[serde(default)]
-    pub cfl: f64,
-    #[serde(default)]
-    pub nsteps: usize,
-    #[serde(default)]
     pub tecplot_interval: usize,
-    #[serde(default)]
-    pub tau_filter: f64,
     #[serde(default)]
     pub apply_fargo_trick: bool,
     #[serde(default)]
@@ -124,43 +77,19 @@ pub struct SVFConfig {
     #[serde(default)]
     pub dt: f64,
     #[serde(default)]
-    pub isothermal: bool,
-}
-
-#[derive(Debug, Deserialize, Default)]
-pub struct VSIConfig {
-    #[serde(default)]
     pub plot_many_horizontal_planes: bool,
     #[serde(default)]
     pub time_interval_for_many_horizontal_plots: f64,
-    #[serde(default)]
-    pub restart: bool,
     #[serde(default)]
     pub file_version: FileVersion,
     #[serde(default)]
     pub perturb: bool,
     #[serde(default)]
-    pub isothermal: bool,
-    #[serde(default)]
-    pub nr: usize,
-    #[serde(default)]
-    pub nz: usize,
-    #[serde(default)]
-    pub nphi: usize,
-    #[serde(default)]
     pub phi_max_over_pi: f64,
-    #[serde(default)]
-    pub cfl: f64,
     #[serde(default)]
     pub dt_min: f64,
     #[serde(default)]
-    pub nsteps: usize,
-    #[serde(default)]
-    pub tecplot_interval: usize,
-    #[serde(default)]
     pub output_profiles: bool,
-    #[serde(default)]
-    pub profiles_interval: usize,
     #[serde(default)]
     pub output_phi_reynolds_averages: bool,
     #[serde(default)]
@@ -188,18 +117,6 @@ pub struct VSIConfig {
     #[serde(default)]
     pub tau_cooling_over_t_kepler_at_mid_radius: f64,
     #[serde(default)]
-    pub apply_pade_filter: bool,
-    #[serde(default)]
-    pub eps_or_tau: EpsOrTau,
-    #[serde(default)]
-    pub eps_filter: f64,
-    #[serde(default)]
-    pub tau_filter: f64,
-    #[serde(default)]
-    pub apply_artificial_pressure: bool,
-    #[serde(default)]
-    pub c_ap: f64,
-    #[serde(default)]
     pub apply_viscosity: bool,
     #[serde(default)]
     pub viscosity_type: ViscosityType,
@@ -212,53 +129,11 @@ pub struct VSIConfig {
     #[serde(default)]
     pub balanced: bool,
     #[serde(default)]
-    pub apply_fargo_trick: bool,
-    #[serde(default)]
-    pub apply_fargo_correction: bool,
-    #[serde(default)]
     pub sponge: SpongeSettings,
-}
-
-#[derive(Debug, Deserialize, Default)]
-pub struct VPConfig {
-    #[serde(default)]
-    pub restart: bool,
-    #[serde(default)]
-    pub nr: usize,
-    #[serde(default)]
-    pub nphi: usize,
-    #[serde(default)]
-    pub cfl: f64,
-    #[serde(default)]
-    pub nsteps: usize,
     #[serde(default)]
     pub hit_target: bool,
     #[serde(default)]
     pub t_target: f64,
-    #[serde(default)]
-    pub tecplot_interval: usize,
-    #[serde(default)]
-    pub tau_filter: f64,
-    #[serde(default)]
-    pub apply_fargo_trick: bool,
-    #[serde(default)]
-    pub integer_shifts: bool,
-    #[serde(default)]
-    pub apply_fargo_correction: bool,
-    #[serde(default)]
-    pub use_supplied_dt: bool,
-    #[serde(default)]
-    pub dt: f64,
-    #[serde(default)]
-    pub isothermal: bool,
-    #[serde(default)]
-    pub apply_artificial_pressure: bool,
-    #[serde(default)]
-    pub c_ap: f64,
-}
-
-#[derive(Debug, Deserialize, Default)]
-pub struct TCFConfig {
     #[serde(default)]
     pub mode: Mode,
     #[serde(default)]
@@ -266,163 +141,22 @@ pub struct TCFConfig {
     #[serde(default)]
     pub re_dong: f64,
     #[serde(default)]
-    pub restart: bool,
-    #[serde(default)]
-    pub file_version: FileVersion,
-    #[serde(default)]
-    pub perturb: bool,
-    #[serde(default)]
-    pub nr: usize,
-    #[serde(default)]
-    pub nz: usize,
-    #[serde(default)]
-    pub nphi: usize,
-    #[serde(default)]
-    pub cfl: f64,
-    #[serde(default)]
-    pub nsteps: usize,
-    #[serde(default)]
-    pub tecplot_interval: usize,
-    #[serde(default)]
-    pub profiles_interval: usize,
-    #[serde(default)]
-    pub save_interval: usize,
-    #[serde(default)]
     pub history_interval: usize,
-    #[serde(default)]
-    pub apply_pade_filter: bool,
-    #[serde(default)]
-    pub eps_or_tau: EpsOrTau,
-    #[serde(default)]
-    pub eps_filter: f64,
-    #[serde(default)]
-    pub tau_filter: f64,
-}
-
-#[derive(Debug, Deserialize, Default)]
-pub struct AdvectionConfig {
-    #[serde(default)]
-    pub restart: bool,
-    #[serde(default)]
-    pub file_version: FileVersion,
-    #[serde(default)]
-    pub nr: usize,
-    #[serde(default)]
-    pub nz: usize,
-    #[serde(default)]
-    pub nphi: usize,
     #[serde(default)]
     pub t_max_over_pi: f64,
     #[serde(default)]
-    pub cfl: f64,
-    #[serde(default)]
-    pub apply_pade_filter: bool,
-    #[serde(default)]
-    pub eps_filter: f64,
-}
-
-#[derive(Debug, Deserialize, Default)]
-pub struct TimedVSIConfig {
-    #[serde(default)]
-    pub n_output_steps: usize,
-    #[serde(default)]
-    pub dt_output: f64,
-    #[serde(default)]
-    pub restart: bool,
-    #[serde(default)]
-    pub file_version: FileVersion,
-    #[serde(default)]
-    pub perturb: bool,
-    #[serde(default)]
-    pub isothermal: bool,
-    #[serde(default)]
-    pub nr: usize,
-    #[serde(default)]
-    pub nz: usize,
-    #[serde(default)]
-    pub nphi: usize,
-    #[serde(default)]
-    pub phi_max_over_pi: f64,
-    #[serde(default)]
-    pub cfl: f64,
-    #[serde(default)]
-    pub dt_min: f64,
-    #[serde(default)]
-    pub nsteps: usize,
-    #[serde(default)]
-    pub use_supplied_dt: bool,
-    #[serde(default)]
     pub dt_supplied: f64,
     #[serde(default)]
-    pub tecplot_interval: usize,
-    #[serde(default)]
-    pub output_profiles: bool,
-    #[serde(default)]
-    pub profiles_interval: usize,
-    #[serde(default)]
-    pub output_phi_reynolds_averages: bool,
-    #[serde(default)]
-    pub time_interval_for_phi_reynolds_averages: f64,
-    #[serde(default)]
-    pub fluctuation_kinetic_energy_interval: usize,
-    #[serde(default)]
-    pub save_interval: usize,
-    #[serde(default)]
-    pub wavy_perturbation: bool,
-    #[serde(default)]
-    pub zmax_over_h0: f64,
-    #[serde(default)]
-    pub use_rsize_for_domain: bool,
-    #[serde(default)]
-    pub rsize_over_h0: f64,
-    #[serde(default)]
-    pub rmin_over_h0: f64,
-    #[serde(default)]
-    pub n_waves_in_r: usize,
-    #[serde(default)]
-    pub use_manger_p: bool,
-    #[serde(default)]
-    pub apply_newtonian_cooling: bool,
-    #[serde(default)]
-    pub tau_cooling_over_t_kepler_at_mid_radius: f64,
-    #[serde(default)]
-    pub apply_pade_filter: bool,
-    #[serde(default)]
-    pub eps_or_tau: EpsOrTau,
-    #[serde(default)]
-    pub eps_filter: f64,
-    #[serde(default)]
-    pub tau_filter: f64,
-    #[serde(default)]
     pub filtering_interval: usize,
-    #[serde(default)]
-    pub apply_artificial_pressure: bool,
-    #[serde(default)]
-    pub c_ap: f64,
-    #[serde(default)]
-    pub apply_viscosity: bool,
-    #[serde(default)]
-    pub viscosity_type: ViscosityType,
-    #[serde(default)]
-    pub c_ddsv: f64,
-    #[serde(default)]
-    pub name_using_step: bool,
-    #[serde(default)]
-    pub balanced: bool,
-    #[serde(default)]
-    pub apply_fargo_trick: bool,
-    #[serde(default)]
-    pub bc: BoundaryConditions,
-    #[serde(default)]
-    pub sponge: SpongeSettings,
 }
 
-#[derive(Debug, Deserialize, Default)]
+#[derive(Debug, Deserialize, Default, PartialEq)]
 #[serde(rename_all = "snake_case")]
 pub enum ProblemType {
     #[default]
     AcousticPulse,
     ShockTube,
+    DensityWaves,
 }
 
 #[derive(Debug, Deserialize, Default)]
