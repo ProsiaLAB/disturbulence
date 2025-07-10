@@ -1,10 +1,16 @@
+pub mod activate;
 pub mod advection;
 pub mod config;
 pub mod euler;
+pub mod handler;
 pub mod hsbr;
+pub mod mesh;
 pub mod modes;
+pub mod setup;
 pub mod svf;
 pub mod tcf;
+pub mod timestep;
+pub mod types;
 pub mod user;
 pub mod vhb;
 pub mod vp;
