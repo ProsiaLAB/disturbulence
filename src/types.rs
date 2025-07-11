@@ -1,5 +1,5 @@
-use ndarray::ArrayView1;
 use ndarray::{Array1, Array2, Array3};
+use ndarray::{Array4, ArrayView1};
 use num_complex::Complex;
 
 /// A fixed-length array of real ([f64]) numbers.
@@ -19,6 +19,9 @@ pub type CMatrix = Array2<Complex<f64>>;
 
 /// A 3-dimensional array (tensor) of real ([f64]) numbers.
 pub type RTensor = Array3<f64>;
+
+/// A 4-dimensional array (tensor) of real ([f64]) numbers.
+pub type RTensor4 = Array4<f64>;
 
 /// A 3-dimensional array (tensor) of complex ([f64]) numbers.
 pub type CTensor = Array3<Complex<f64>>;
