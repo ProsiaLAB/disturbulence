@@ -1,6 +1,7 @@
 pub mod activate;
 pub mod advection;
 pub mod config;
+pub mod constants;
 pub mod euler;
 pub mod handler;
 pub mod hsbr;
