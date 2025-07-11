@@ -1,4 +1,4 @@
-[vortex_pair]
+run_type = "vortex_pair"
 restart = false
 nr = 512
 nphi = 512

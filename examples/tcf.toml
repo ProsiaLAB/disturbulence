@@ -1,4 +1,4 @@
-[taylor_couette_flow]
+run_type = "taylor_couette_flow"
 # TCF modes
 # Options:
 # - `marcus`: Marcus axisymmetric Taylor-Couette

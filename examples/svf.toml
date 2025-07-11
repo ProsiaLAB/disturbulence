@@ -1,4 +1,4 @@
-[single_vortex_fargo_test]
+run_type = "single_vortex_fargo"
 restart = false
 nr = 1024
 nphi = 1024

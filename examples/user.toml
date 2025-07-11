@@ -1,4 +1,4 @@
-[user_application]
+run_type = "user_application"
 restart = false
 nr = 1
 nz = 1

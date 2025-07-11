@@ -1,4 +1,4 @@
-[vertical_shear_instability]
+run_type = "vertical_shear_instability"
 plot_many_horizontal_planes = true
 time_interval_for_many_horizontal_plots = 0.5
 restart = true
@@ -93,14 +93,14 @@ apply_fargo_correction = true
 # - `zero_shear_stress`
 # - `z_dirichlet`
 # - `hold_basic_state`
-[vertical_shear_instability.bc]
+[bc]
 rmin = "zero_normal_momentum"
 rmax = "zero_normal_momentum"
 zmin = "zero_normal_momentum"
 zmax = "zero_normal_momentum"
 
 
-[vertical_shear_instability.sponge]
+[sponge]
 apply_sponge = true
 # Sponge type
 # Options:

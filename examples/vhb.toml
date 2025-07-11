@@ -1,4 +1,4 @@
-[vertical_hydrostatic_balance]
+run_type = "vertical_hydrostatic_balance"
 nz = 256
 cfl = 1.0
 nsteps = 1000

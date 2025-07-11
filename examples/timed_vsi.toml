@@ -1,4 +1,4 @@
-[timed_vsi_output]
+run_type = "timed_vsi_output"
 n_output_steps = 4
 dt_output = 0.25
 
@@ -100,14 +100,14 @@ apply_fargo_correction = true
 # - `zero_shear_stress`
 # - `z_dirichlet`
 # - `hold_basic_state`
-[timed_vsi_output.bc]
+[bc]
 rmin = "zero_normal_momentum"
 rmax = "zero_normal_momentum"
 zmin = "zero_normal_momentum"
 zmax = "zero_normal_momentum"
 
 
-[timed_vsi_output.sponge]
+[sponge]
 apply_sponge = true
 # Sponge type
 # Options:

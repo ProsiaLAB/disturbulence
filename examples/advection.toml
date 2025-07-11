@@ -1,4 +1,4 @@
-[advection_test]
+run_type = "advection"
 restart = false
 
 # File version

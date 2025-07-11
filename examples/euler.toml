@@ -1,8 +1,9 @@
-[euler_1d_test_z]
+run_type = "euler"
 # Problem type
 # Options:
 # - `acoustic_pulse`
 # - `shock_tube`
+# - `density_waves`
 problem_type = "acoustic_pulse"
 
 nz = 512
