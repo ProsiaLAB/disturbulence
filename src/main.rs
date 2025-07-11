@@ -1,18 +1,13 @@
 use std::env;
 
 use anyhow::Result;
-// use fftw::array::AlignedVec;
-// use fftw::plan::R2CPlan;
-// use fftw::plan::R2CPlanMany;
-// use fftw::types::Flag;
-// use fftw::types::c64;
 
 use disturbulence::advection;
-use disturbulence::config::load_config;
+use disturbulence::core::RunType;
 use disturbulence::euler;
+use disturbulence::euler::run;
 use disturbulence::hsbr;
-use disturbulence::modes::Config;
-use disturbulence::modes::RunType;
+use disturbulence::io::load_config;
 use disturbulence::svf;
 use disturbulence::tcf;
 use disturbulence::user;
@@ -30,32 +25,18 @@ fn main() -> Result<()> {
     let config = load_config(file)?;
 
     match config.run_type {
-        RunType::UserApplication => user::run(),
-        RunType::Euler1DTestZ => euler::run(config),
-        RunType::VerticalHydrostaticBalance => vhb::run(),
-        RunType::SolidBodyRotation => hsbr::run(),
-        RunType::SingleVortexFargoTest => svf::run(),
-        RunType::VerticalShearInstability => vsi::run(),
-        RunType::VortexPair => vp::run(),
-        RunType::TaylorCouetteFlow => tcf::run(),
-        RunType::AdvectionTest => advection::run(),
-        RunType::TimedVsiOutput => vsi::run_timed(),
+        // RunType::UserApplication => simulate(&config, &user::User),
+        RunType::Euler => run(&config),
+        // RunType::VerticalHydrostaticBalance => simulate(&config, &vhb::VHB),
+        // RunType::SolidBodyRotation => simulate(&config, &hsbr::HSBR),
+        // RunType::SingleVortexFargo => simulate(&config, &svf::SVF),
+        // RunType::VerticalShearInstability => simulate(&config, &vsi::VSI),
+        // RunType::VortexPair => simulate(&config, &vp::VP),
+        // RunType::TaylorCouetteFlow => simulate(&config, &tcf::TCF),
+        // RunType::Advection => simulate(&config, &advection::Advection),
+        // RunType::TimedVsiOutput => simulate(&config, &vsi::VSITimed),
+        _ => todo!(),
     };
-
-    // let nphi = 128;
-    // let num_transforms = 16;
-    // let total_len = nphi * num_transforms;
-
-    // let mut input: AlignedVec<f64> = AlignedVec::new(total_len);
-    // let mut output: AlignedVec<c64> = AlignedVec::new((nphi / 2 + 1) * num_transforms);
-
-    // let plan: fftw::plan::R2CPlan64 = R2CPlan::aligned(&[nphi], Flag::ESTIMATE).unwrap();
-
-    // for i in 0..num_transforms {
-    //     let in_slice = &mut input[i * nphi..(i + 1) * nphi];
-    //     let out_slice = &mut output[i * (nphi / 2 + 1)..(i + 1) * (nphi / 2 + 1)];
-    //     plan.r2c(in_slice, out_slice).unwrap();
-    // }
 
     Ok(())
 }

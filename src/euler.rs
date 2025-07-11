@@ -1,23 +1,23 @@
 use ndarray::s;
 
-use crate::activate::{self, PadeFilterConfig};
-use crate::mesh::{MeshSetup, set_up_domain_mesh_and_partition};
-use crate::modes::{BCType, Config, EpsOrTau, ProblemType};
-use crate::setup::{BCSetup, ThermalSetup, set_up_boundary_conditions, set_up_thermal_parameters};
-use crate::types::{RMatrix, RVector};
+use crate::core::{
+    BCType, BoundaryConditionData, Config, EpsOrTau, ProblemType, ThermalParameters,
+};
+use crate::core::{Grid, QArray, RK4, StretchedMesh, Transposes};
+use crate::fargo::FargoShift;
+use crate::gravity::Gravity;
+use crate::grid::make_grid;
+use crate::pade::PadeFilter;
+use crate::pade::set_up_pade_coefficients;
+use crate::processing::get_xy_coordinates_of_grid;
+use crate::sponge::Sponge;
+use crate::types::{RMatrix, RTensor, RTensor4, RVector};
+use crate::viscosity::Viscosity;
 
-pub fn run(mut cfg: Config) {
-    println!("Running Euler 1D test");
+pub fn run(cfg: &Config) {
+    println!("Running Euler...");
 
-    let mut ci_squared_initial = RMatrix::zeros((cfg.nz, 1));
-
-    let rmin = 1.0;
-    let rmax = 1.0;
-    let phi_min = 0.0;
-    let phi_max = 0.0;
-    let nr = 1;
-    let nphi = 1;
-    let suppress_z_derivatives_when_nz_not_1 = false;
+    const NDOF: usize = 5;
 
     let (zmin, zmax) = match cfg.problem_type {
         ProblemType::AcousticPulse => (0.0, 4.0),
@@ -25,93 +25,134 @@ pub fn run(mut cfg: Config) {
         ProblemType::DensityWaves => (-5.0, 5.0),
     };
 
-    let gamma = 1.4;
-    let gm1 = gamma - 1.0;
-
-    // Set up boundary conditions:
-    cfg.bc.rmin = BCType::Null;
-    cfg.bc.rmax = BCType::Null;
-
-    let eps: f64;
-    let z0: f64;
-    let sigma: f64;
-    let p0: f64;
-    let rho0: f64;
-
-    if cfg.problem_type == ProblemType::AcousticPulse {
-        cfg.apply_artificial_pressure = false;
-        cfg.apply_pade_filter = false;
-        if cfg.periodic_z {
-            cfg.bc.zmin = BCType::Periodic;
-            cfg.bc.zmax = BCType::Periodic;
-        } else {
-            cfg.bc.zmin = BCType::NonReflective;
-            cfg.bc.zmax = BCType::NonReflective;
-            cfg.balanced = true;
-        }
-        eps = 0.005;
-        z0 = 2.0;
-        sigma = 0.04 * (zmax - zmin);
-        p0 = if cfg.isothermal { 1.0 } else { 1.0 / gamma };
-        rho0 = 1.0;
-    } else {
-        // `ProblemType::ShockTube` or `ProblemType::DensityWaves`:
-        cfg.isothermal = false;
-        cfg.periodic_z = false;
-        cfg.bc.zmin = BCType::ZDirichlet;
-        cfg.bc.zmax = BCType::ZDirichlet;
+    let isothermal = match cfg.problem_type {
+        ProblemType::AcousticPulse => cfg.isothermal,
+        _ => false,
     };
 
-    let setup = MeshSetup {
-        rmin,
-        rmax,
-        zmin,
-        zmax,
-        phi_min,
-        phi_max,
-        nr,
-        nz: cfg.nz,
-        nphi,
-        suppress_z_derivatives_when_nz_not_1,
-        periodic_z: cfg.periodic_z,
-        stretched_r: false,
-        stretched_z: false,
-        r0: 0.0,
-        nr_u: 0,
-        z0: 0.0,
-        nz_u: 0,
-    };
+    let mut ci_squared_initial = RMatrix::zeros((cfg.nz, 1));
 
-    set_up_domain_mesh_and_partition(setup);
-
-    let mut c_sound_rmin: f64 = 0.0;
-    let mut c_sound_rmax: f64 = 0.0;
-
-    if cfg.isothermal {
-        // Not used here
-        c_sound_rmin = 1.0;
-        c_sound_rmax = 1.0;
-
+    if isothermal {
         ci_squared_initial.slice_mut(s![.., 0]).fill(1.0);
     }
 
-    cfg.apply_newtonian_cooling = false;
-    let tau_newtonian_cooling = 0.0;
+    let stretched_mesh = StretchedMesh::default();
 
-    let thermal_setup = ThermalSetup {
-        gamma,
-        isothermal: cfg.isothermal,
-        apply_newtonian_cooling: cfg.apply_newtonian_cooling,
-        tau_newtonian_cooling,
+    let grid = Grid {
+        rmin: 1.0,
+        rmax: 1.0,
+        zmin,
+        zmax,
+        phi_min: 0.0,
+        phi_max: 0.0,
+        nr: 1,
+        nz: cfg.nz,
+        nphi: 1,
+        suppress_z_derivatives_when_nz_not_1: false,
+        periodic_z: cfg.periodic_z,
+        nz_actual: cfg.nz, // As `suppress_z_derivatives_when_nz_not_1` is false.
+        ..Default::default()
+    };
+
+    let qarr = QArray {
+        q: RTensor4::zeros((grid.nr, grid.nphi, grid.nz, NDOF)),
+        pressure: RTensor::zeros((grid.nr, grid.nphi, grid.nz)),
+    };
+
+    let rk4 = RK4 {
+        q_accum: RTensor4::zeros((grid.nr, grid.nphi, grid.nz, NDOF)),
+        q_next_arg: RTensor4::zeros((grid.nr, grid.nphi, grid.nz, NDOF)),
+        qdot: RTensor4::zeros((grid.nr, grid.nphi, grid.nz, NDOF)),
+    };
+
+    let tranposes = Transposes {
+        q_r_space: RTensor4::zeros((grid.nphi, grid.nz, NDOF, grid.nr)),
+        qdot_r_space: RTensor4::zeros((grid.nphi, grid.nz, NDOF, grid.nr)),
+        p_r_space: RTensor::zeros((grid.nphi, grid.nz, grid.nr)),
+        q_phi_space: RTensor4::zeros((grid.nr, grid.nz, NDOF, grid.nphi)),
+        qdot_phi_space: RTensor4::zeros((grid.nr, grid.nz, NDOF, grid.nphi)),
+        p_phi_space: RTensor::zeros((grid.nr, grid.nz, grid.nphi)),
+    };
+
+    make_grid();
+    set_up_pade_coefficients();
+
+    if grid.nphi != 1 {
+        get_xy_coordinates_of_grid();
+    }
+
+    let fargo = FargoShift::default();
+
+    let pade_filter = PadeFilter::default();
+
+    let viscosity = Viscosity::default();
+
+    let sponge = Sponge::default();
+
+    let gravity = Gravity::default();
+
+    let thermal_parameters = ThermalParameters {
+        gamma: 1.4,
+        gm1: 1.4 - 1.0,
+        isothermal,
+        apply_newtonian_cooling: false,
+        tau_newtonian_cooling: 0.0,
         ci_squared_initial,
     };
 
-    set_up_thermal_parameters(thermal_setup);
+    let (rmin_bc, rmax_bc) = (BCType::Null, BCType::Null);
 
-    let d_ci_dr_inner = RVector::zeros(1);
-    let d_ci_dr_outer = RVector::zeros(1);
+    let (mut zmin_bc, mut zmax_bc) = match cfg.problem_type {
+        ProblemType::AcousticPulse => {
+            if cfg.periodic_z {
+                (BCType::Periodic, BCType::Periodic)
+            } else {
+                (BCType::NonReflective, BCType::NonReflective)
+            }
+        }
+        _ => (BCType::ZDirichlet, BCType::ZDirichlet),
+    };
 
-    let bc_setup = BCSetup {
+    let balanced = match cfg.problem_type {
+        ProblemType::AcousticPulse => cfg.periodic_z,
+        _ => false,
+    };
+
+    let (c_sound_rmin, c_sound_rmax) = if isothermal { (1.0, 1.0) } else { (0.0, 0.0) };
+
+    let (c_sound_rmin_used, c_sound_rmax_used) = if rmin_bc == BCType::ViscousWall && !isothermal {
+        (c_sound_rmin, c_sound_rmax)
+    } else {
+        (0.0, 0.0)
+    };
+
+    let q_left_z_bc = if zmin_bc == BCType::ZDirichlet {
+        RVector::zeros(NDOF)
+    } else {
+        RVector::default(NDOF)
+    };
+
+    let q_right_z_bc = if zmax_bc == BCType::ZDirichlet {
+        RVector::zeros(NDOF)
+    } else {
+        RVector::default(NDOF)
+    };
+
+    if grid.periodic_z && zmin_bc != BCType::Periodic {
+        zmin_bc = BCType::Periodic;
+    }
+
+    if grid.periodic_z && zmax_bc != BCType::Periodic {
+        zmax_bc = BCType::Periodic;
+    }
+
+    let (d_ci_dr_inner, d_ci_dr_outer) = if isothermal {
+        (RVector::zeros(1), RVector::zeros(1))
+    } else {
+        (RVector::default(1), RVector::default(1))
+    };
+
+    let bc_data = BoundaryConditionData {
         rmin: rmin_bc,
         rmax: rmax_bc,
         zmin: zmin_bc,
@@ -119,27 +160,16 @@ pub fn run(mut cfg: Config) {
         balanced,
         d_ci_dr_inner,
         d_ci_dr_outer,
-        c_sound_rmin,
-        c_sound_rmax,
-        isothermal: cfg.isothermal,
+        c_sound_rmin: c_sound_rmin_used,
+        c_sound_rmax: c_sound_rmax_used,
+        q_left_z_bc,
+        q_right_z_bc,
+        ..Default::default()
     };
 
-    set_up_boundary_conditions(bc_setup);
+    // if cfg.apply_pade_filter {
+    //     let eps_or_tau = EpsOrTau::Eps;
+    //     let pade_filter =
 
-    let mut eps_or_tau = EpsOrTau::Eps;
-
-    if cfg.apply_pade_filter {
-        eps_or_tau = EpsOrTau::Eps;
-
-        let pf_cfg = PadeFilterConfig {
-            apply_pade_filter: cfg.apply_pade_filter,
-            eps_or_tau,
-            eps_filter: cfg.eps_filter,
-            tau_filter: cfg.tau_filter,
-            filter_relative_to_basic_state: false,
-            filtering_interval: cfg.filtering_interval,
-        };
-
-        activate::pade_filter(pf_cfg);
-    }
+    // }
 }

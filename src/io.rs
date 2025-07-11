@@ -2,7 +2,7 @@ use std::fs;
 
 use anyhow::Result;
 
-use crate::modes::Config;
+use crate::core::Config;
 
 pub fn load_config(path: &str) -> Result<Config> {
     let toml_str = fs::read_to_string(path)?;
