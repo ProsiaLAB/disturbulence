@@ -1,4 +1,4 @@
-use crate::types::{RMatrix, RVector};
+use extensions::types::{RMatrix, RVector};
 
 #[derive(Default)]
 pub struct Gravity {

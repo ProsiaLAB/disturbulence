@@ -1,3 +1,4 @@
+use extensions::types::{RMatrix, RTensor, RTensor4, RVector};
 use ndarray::s;
 
 use crate::core::{
@@ -11,7 +12,6 @@ use crate::pade::PadeFilter;
 use crate::pade::set_up_pade_coefficients;
 use crate::processing::get_xy_coordinates_of_grid;
 use crate::sponge::Sponge;
-use crate::types::{RMatrix, RTensor, RTensor4, RVector};
 use crate::viscosity::Viscosity;
 
 pub fn run(cfg: &Config) {

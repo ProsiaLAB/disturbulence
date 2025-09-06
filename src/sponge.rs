@@ -1,4 +1,4 @@
-use crate::types::RMatrix;
+use extensions::types::RMatrix;
 
 #[derive(Default)]
 pub struct Sponge {

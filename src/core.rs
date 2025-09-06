@@ -1,6 +1,6 @@
 use serde::Deserialize;
 
-use crate::types::{RMatrix, RTensor, RTensor4, RVector};
+use extensions::types::{RMatrix, RTensor, RTensor4, RVector};
 
 #[derive(Debug, Deserialize, Default)]
 #[serde(rename_all = "snake_case")]

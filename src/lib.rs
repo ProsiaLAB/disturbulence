@@ -13,7 +13,6 @@ pub mod sponge;
 pub mod svf;
 pub mod tcf;
 pub mod timestep;
-pub mod types;
 pub mod user;
 pub mod vhb;
 pub mod viscosity;

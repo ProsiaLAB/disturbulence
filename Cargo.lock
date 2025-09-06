@@ -208,6 +208,7 @@ name = "disturbulence"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "extensions",
  "fftw",
  "ndarray 0.16.1",
  "num-complex",
@@ -226,6 +227,15 @@ name = "equivalent"
 version = "1.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "877a4ace8713b0bcf2a4e7eec82529c029f1d0619886d18145fea96c3ffe5c0f"
+
+[[package]]
+name = "extensions"
+version = "0.1.0"
+source = "git+https://github.com/ProsiaLAB/extensions#e6a38f38a247ff459659c28aff982477fcab62dd"
+dependencies = [
+ "ndarray 0.16.1",
+ "num-complex",
+]
 
 [[package]]
 name = "fftw"
