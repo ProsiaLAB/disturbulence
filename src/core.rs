@@ -203,7 +203,7 @@ pub struct Grid {
     pub phi_max: f64,
     pub delta_phi_domain: f64,
     /// For time step computation due to Yoshizawa model.  These arrays are dimensioned (sr:er,nz) and
-    /// is assigned values in subroutine make_grid.
+    /// is assigned values in subroutine [`make_grid`](crate::grid::make_grid).
     pub min_grid_size: RMatrix,
     pub l_grid_squared: RMatrix,
     /// Grid spacing vector for Vreman SGS model:

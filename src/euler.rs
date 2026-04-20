@@ -1,9 +1,7 @@
 use extensions::types::{RMatrix, RTensor, RTensor4, RVector};
 use ndarray::s;
 
-use crate::core::{
-    BCType, BoundaryConditionData, Config, EpsOrTau, ProblemType, ThermalParameters,
-};
+use crate::core::{BCType, BoundaryConditionData, Config, ProblemType, ThermalParameters};
 use crate::core::{Grid, QArray, RK4, StretchedMesh, Transposes};
 use crate::fargo::FargoShift;
 use crate::gravity::Gravity;
@@ -15,9 +13,9 @@ use crate::sponge::Sponge;
 use crate::viscosity::Viscosity;
 
 pub fn run(cfg: &Config) {
-    println!("Running Euler...");
-
     const NDOF: usize = 5;
+
+    println!("Running Euler...");
 
     let (zmin, zmax) = match cfg.problem_type {
         ProblemType::AcousticPulse => (0.0, 4.0),

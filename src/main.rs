@@ -17,10 +17,7 @@ use disturbulence::vsi;
 
 fn main() -> Result<()> {
     let args: Vec<String> = env::args().collect();
-    let file = args
-        .get(1)
-        .map(String::as_str)
-        .unwrap_or("examples/vsi.toml");
+    let file = args.get(1).map_or("examples/vsi.toml", String::as_str);
 
     let config = load_config(file)?;
 
@@ -36,7 +33,7 @@ fn main() -> Result<()> {
         // RunType::Advection => simulate(&config, &advection::Advection),
         // RunType::TimedVsiOutput => simulate(&config, &vsi::VSITimed),
         _ => todo!(),
-    };
+    }
 
     Ok(())
 }

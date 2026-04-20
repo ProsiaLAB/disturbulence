@@ -1,3 +1,6 @@
+#![allow(clippy::struct_excessive_bools)]
+#![allow(clippy::too_many_lines)]
+
 pub mod advection;
 pub mod constants;
 pub mod core;
